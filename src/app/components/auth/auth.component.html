@@ -1,0 +1,24 @@
+<div class="auth-inner">
+  <p-card>
+    <form [formGroup]="authForm" (submit)="login()">
+      <div class="auth-form">
+        <div class="ui-inputgroup">
+          <div class="ui-inputgroup-addon">
+            <i class="fa fa-user"></i>
+          </div>
+          <input pInputText type="text" formControlName="username" placeholder="Username">
+        </div>
+        <div class="ui-inputgroup">
+          <div class="ui-inputgroup-addon">
+            <i class="fa fa-key"></i>
+          </div>
+          <input pInputText type="password" formControlName="password" placeholder="Password">
+        </div>
+      </div>
+      <div class="auth-buttons">
+        <button pButton type="button" class="ui-button-info" (click)="register()" label="Register" [disabled]="authForm.invalid"></button>
+        <button pButton type="submit" label="Login" [disabled]="authForm.invalid"></button>
+      </div>
+    </form>
+  </p-card>
+</div>

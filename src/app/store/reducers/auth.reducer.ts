@@ -20,6 +20,8 @@ export const authReducer: (state: AuthState, action: Action) => AuthState = (
   switch (action.type) {
     case AuthActionTypes.LOGIN_USER:
       return { ...state, loading: true, loaded: false };
+    case AuthActionTypes.LOGOUT_USER:
+      return { ...state, loading: true, loaded: false };
     case AuthActionTypes.REGISTER_USER:
       return { ...state, loading: true, loaded: false };
     case AuthActionTypes.SET_INITIAL_USER:

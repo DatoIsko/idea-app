@@ -1,0 +1,8 @@
+<p-menubar [model]="items">
+  <button
+    pButton
+    icon="fa fa-sign-out"
+    [label]="isAuth ? 'Logout' : 'Login'"
+    (click)="logout()"
+  ></button>
+</p-menubar>

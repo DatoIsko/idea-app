@@ -5,7 +5,7 @@ import { Observable, of } from 'rxjs';
 import { mergeMap, map, catchError, tap } from 'rxjs/operators';
 
 import { AuthService } from '@app/services/auth.service';
-import { SetInitialUser, AuthActionTypes, SetCurrentUser, LoginUser, RegisterUser } from '@store/actions/auth.action';
+import { SetInitialUser, AuthActionTypes, SetCurrentUser, LoginUser, RegisterUser, LogoutUser } from '@store/actions/auth.action';
 import { User } from '@app/models/user';
 import { AddError, RemoveError } from '@store/actions/errors.action';
 import { AppState } from '../app-store.module';
@@ -25,7 +25,11 @@ export class AuthEffects {
     mergeMap((action: SetInitialUser) => this.authService.whoami()
       .pipe(
         map((user: User) => new SetCurrentUser(user)),
-        catchError(err => of(new AddError(err)))
+        catchError(err => {
+          this.store.dispatch(new SetCurrentUser(null));
+          this.authService.token = null;
+          return of(new AddError(err.error));
+        })
       )
     )
   );
@@ -36,12 +40,28 @@ export class AuthEffects {
     tap(() => this.store.dispatch(new RemoveError())),
     mergeMap((action: LoginUser) => this.authService.login(action.payload)
       .pipe(
-        map((user: User) => {
-          console.log('user', user);
+        map((user: User) => new SetCurrentUser(user)),
+        catchError(err => {
+          this.store.dispatch(new SetCurrentUser(null));
+          this.authService.token = null;
+          return of(new AddError(err.error));
+        })
+      )
+    )
+  );
 
-          return new SetCurrentUser(user);
-        }),
-        catchError(err => of(new AddError(err)))
+  @Effect()
+  logoutUser$: Observable<Action> = this.action$.pipe(
+    ofType<LogoutUser>(AuthActionTypes.LOGOUT_USER),
+    tap(() => this.store.dispatch(new RemoveError())),
+    mergeMap((action: LogoutUser) => this.authService.logout()
+      .pipe(
+        map(() => new SetCurrentUser(null)),
+        catchError(err => {
+          this.store.dispatch(new SetCurrentUser(null));
+          this.authService.token = null;
+          return of(new AddError(err.error));
+        })
       )
     )
   );
@@ -53,7 +73,11 @@ export class AuthEffects {
     mergeMap((action: RegisterUser) => this.authService.register(action.payload)
       .pipe(
         map((user: User) => new SetCurrentUser(user)),
-        catchError(err => of(new AddError(err)))
+        catchError(err => {
+          this.store.dispatch(new SetCurrentUser(null));
+          this.authService.token = null;
+          return of(new AddError(err.error));
+        })
       )
     )
   );

@@ -6,15 +6,25 @@ import { EffectsModule } from '@ngrx/effects';
 import { errorReducer, ErrorState } from '@store/reducers/errors.reducer';
 import { AuthEffects } from '@app/store/effects/auth.effect';
 import { AuthState, authReducer } from '@store/reducers/auth.reducer';
+import {
+  StoreRouterConnectingModule,
+  routerReducer,
+  RouterReducerState,
+  RouterStateSerializer
+} from '@ngrx/router-store';
+import { RouterStateUrl, CustomSerializer } from '@store/reducers/router.reducer';
+import { environment } from '@env/environment';
 
 export interface AppState {
   error: ErrorState;
   auth: AuthState;
+  router: RouterReducerState<RouterStateUrl>;
 }
 
 export const reducers: ActionReducerMap<AppState> = {
   error: errorReducer,
-  auth: authReducer
+  auth: authReducer,
+  router: routerReducer
 };
 
 export const effects = [
@@ -28,6 +38,11 @@ export const effects = [
     CommonModule,
     EffectsModule.forRoot(effects),
     StoreModule.forRoot(reducers),
+    StoreRouterConnectingModule.forRoot({
+      // serializer: CustomSerializer,
+      // navigationActionTiming: NavigationActionTiming.PreActivation,
+      // routerState: RouterState.Full,
+    }),
     // StoreModule.forRoot(reducers, {
     //   // metaReducers,
     //   // runtimeChecks: {
@@ -35,8 +50,11 @@ export const effects = [
     //   //   strictActionImmutability: true
     //   // }
     // }),
-    // StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production })
-    StoreDevtoolsModule.instrument()
-  ]
+    StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production })
+  ],
+  providers: [{
+    provide: RouterStateSerializer,
+    useClass: CustomSerializer
+  }]
 })
 export class AppStoreModule { }

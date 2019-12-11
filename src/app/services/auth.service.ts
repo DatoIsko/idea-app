@@ -48,4 +48,9 @@ export class AuthService {
       localStorage.clear();
     }
   }
+
+  logout() {
+    localStorage.removeItem('idea_token');
+    return of(false);
+  }
 }
